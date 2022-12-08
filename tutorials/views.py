@@ -9,6 +9,7 @@ from tutorials.serializers import TutorialSerializer
 from rest_framework.decorators import api_view
 
 import pandas as pd
+import matplotlib.pyplot as plt 
 
 # Create your views here.
 @api_view(['GET', 'POST', 'DELETE'])
@@ -41,7 +42,22 @@ def analisis_list(request):
         
         tutorials_serializer = TutorialSerializer(tutorials, many=True)
         return JsonResponse(tutorials_serializer.data, safe=False)
-    elif request.method == 'POST':
-        data = request.POST
+    elif request.method == 'POST' and request.POST.get('vuelta') == '1':
+        #data = request.POST
         df = pd.read_csv(request.FILES['file'].file)
-        return JsonResponse(str(df.to_html(classes="table table-hover table-dark table-responsive")), safe=False)
+
+        data = [
+            str(df.to_html(classes="table table-hover table-dark table-responsive")),
+            df.shape,
+            str(df.dtypes),
+            str(df.isnull().sum()),
+            str(request.POST.get('tipo'))
+        ]
+        return JsonResponse(data, safe=False)
+    elif request.method == 'POST' and request.POST.get('vuelta') == '2':
+        df = pd.read_csv(request.FILES['file'].file)
+        df.hist(figsize=(14,14), xrot=45)
+        response = HttpResponse(content_type="image/jpeg")
+        plt.savefig(response, format="png")
+        return response
+
