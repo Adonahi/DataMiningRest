@@ -50,8 +50,7 @@ def analisis_list(request):
             str(df.to_html(classes="table table-hover table-dark table-responsive")),
             df.shape,
             str(df.dtypes),
-            str(df.isnull().sum()),
-            str(request.POST.get('tipo'))
+            str(df.isnull().sum())
         ]
         return JsonResponse(data, safe=False)
     elif request.method == 'POST' and request.POST.get('vuelta') == '2':
